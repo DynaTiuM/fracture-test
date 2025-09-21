@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Embed Test - fracture-test</title>
+  <style>
+    body { font-family: system-ui,Segoe UI,Roboto,Helvetica,Arial; padding: 1rem; }
+    label,button { margin: .25rem 0; display:block }
+    iframe { width: 100%; height: 70vh; border: 1px solid #ccc; }
+    #status { margin-top: .5rem; }
+  </style>
+</head>
+<body>
+  <h1>Embed test for fracture-test</h1>
+  <p>This page embeds the real GitHub Pages site in an iframe to test whether it can be framed by a 3rd-party page (like Discord).</p>
+
+  <label>
+    Target URL
+    <input id="target" type="text" value="https://dynatium.github.io/fracture-frontend/" style="width:100%" />
+  </label>
+
+  <label>
+    <input id="sandboxToggle" type="checkbox" /> Add sandbox attribute (simulate restricted iframe)
+  </label>
+
+  <button id="loadBtn">Load iframe</button>
+  <div id="status">Status: idle</div>
+  <div style="margin-top:12px">
+    <iframe id="testFrame" src="about:blank" title="Embed test"></iframe>
+  </div>
+
+  <script>
+    const frame = document.getElementById('testFrame');
+    const status = document.getElementById('status');
+    const loadBtn = document.getElementById('loadBtn');
+    const targetInput = document.getElementById('target');
+    const sandboxToggle = document.getElementById('sandboxToggle');
+
+    function setStatus(text) {
+      status.textContent = 'Status: ' + text;
+    }
+
+    loadBtn.addEventListener('click', () => {
+      const url = targetInput.value.trim();
+      if (!url) return setStatus('Please set a target URL');
+
+      // Set sandbox attribute if checked
+      if (sandboxToggle.checked) {
+        frame.setAttribute('sandbox', 'allow-scripts allow-same-origin');
+      } else {
+        frame.removeAttribute('sandbox');
+      }
+
+      setStatus('loading...');
+      // set src last so the attribute changes take effect first
+      frame.src = url;
+
+      // If the iframe loads, the onload event should fire
+      frame.onload = () => {
+        try {
+          // Try a small access test to see if cross-origin blocks access
+          const doc = frame.contentDocument || frame.contentWindow.document;
+          setStatus('loaded — iframe accessible (same-origin)');
+        } catch (e) {
+          setStatus('loaded — iframe loaded but cross-origin (cannot access content)');
+        }
+      };
+
+      // onerror won't always fire for cross-origin navigation, add timeout
+      setTimeout(() => {
+        if (frame.src === 'about:blank') return;
+        // If still loading after 6 seconds, show a likely-failed status
+        setStatus((status.textContent.includes('loaded') ? status.textContent.replace('Status: ', '') : 'loaded or blocked — check visually if content shows') );
+      }, 6000);
+    });
+  </script>
+</body>
+</html>
