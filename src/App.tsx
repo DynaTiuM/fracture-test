@@ -1,10 +1,26 @@
-export default function App() {
-  //const { user, loading } = useDiscordUser();
+import React from 'react';
+import logo from './logo.svg';
+import './App.css';
 
-  //if (loading) return <p>Loading Discord user...</p>;
-  //if (!user) return <p>Failed to load Discord user</p>;
+function App() {
   return (
-  <div className="min-h-screen">
-    <h2>Welcome</h2>
-  </div>);
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <p>
+          Edit <code>src/App.tsx</code> and save to reload.
+        </p>
+        <a
+          className="App-link"
+          href="https://reactjs.org"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          Learn React
+        </a>
+      </header>
+    </div>
+  );
 }
+
+export default App;
